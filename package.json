@@ -1,0 +1,30 @@
+{
+  "name": "xchat",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@types/node": "20.6.3",
+    "@types/react": "18.2.22",
+    "@types/react-dom": "18.2.7",
+    "@web3modal/wagmi": "^3.0.0-beta.3",
+    "ethers": "^6.8.0",
+    "firebase-admin": "^11.11.0",
+    "next": "13.5.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "siwe": "^2.1.4",
+    "typescript": "5.2.2",
+    "wagmi": "^1.4.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5"
+  }
+}
