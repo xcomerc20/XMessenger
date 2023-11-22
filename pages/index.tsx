@@ -1,6 +1,4 @@
 import Head from "next/head";
-import styles from "@/styles/Home.module.css";
-import Header from "@/components/Header";
 import Login from "@/components/Login";
 
 export default function Home() {
@@ -23,8 +21,7 @@ export default function Home() {
           height: "100vh",
           width: "100%",
           // border: "1px solid grey",
-          background:
-            "url(https://crx.ie/_next/image?url=%2Fassets%2Flogin-bg.png&w=1080&q=75)",
+          background: "url('/login-bg.webp')",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
         }}

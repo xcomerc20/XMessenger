@@ -15,3 +15,12 @@ export type TokenBalance = {
   token_instance: any;
   value: string;
 };
+
+export interface IMessage {
+  r: boolean;
+  c: string;
+  s: string;
+  t: { _seconds: number; _nanoseconds: number };
+  m: string;
+  id: string;
+}

@@ -129,6 +129,41 @@ input {
   justify-content: "center";
 }
 
+.modal{
+  background: #4141418c;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal .content{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  width: 500px;
+  padding: 25px;
+  margin: auto;
+  background: #1f2c37;
+  border-radius: 2rem;
+}
+.modal .content .head{
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.modal .content .head svg{
+  border-radius: 50%;
+  padding: 5px;
+  width: 30px;
+  height: 30px;
+}
+.modal .content .head:hover svg{
+  background: #4141418c;
+}
+
 @media (max-width: 640px) {
   .login {
     width: 320px !important ;
@@ -142,5 +177,25 @@ input {
   }
   button {
     font-size: 1rem;
+  }
+  .no-mobile{
+    width: 0 !important;
+  }
+  .full-screen{
+    width: 100vw !important;
+    max-width: unset !important;
+  }
+  .modal .content{
+    width: 90%;
+  }
+  .modal .content h3{
+    font-size: 1.3rem !important;
+  }
+  .modal .content input{
+    font-size: .8rem !important;
+    font-weight: normal;
+  }
+  .splash img{
+    width: 50px !important;
   }
 }
