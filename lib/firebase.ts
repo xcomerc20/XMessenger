@@ -24,3 +24,4 @@ export default function getDatabase() {
   const db = getFirestore();
   return db;
 }
+export const db = getDatabase();

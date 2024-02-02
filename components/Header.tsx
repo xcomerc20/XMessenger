@@ -1,19 +1,22 @@
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useWeb3Modal, useWeb3ModalState } from "@web3modal/wagmi/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useAccount, useBalance, useConnect } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 
 const Header = () => {
   const { isConnected, address } = useAccount();
   const { data } = useBalance({ address });
 
   const { open } = useWeb3Modal();
+  const x = useWeb3ModalState();
+  useEffect(() => {
+    console.log(x.selectedNetworkId, x);
+  }, []);
   const [uiReady, setUiReady] = useState(false);
   useEffect(() => {
     setTimeout(() => setUiReady(true), 10000);
   }, []);
-
   const router = useRouter();
 
   return (
@@ -34,7 +37,7 @@ const Header = () => {
         }}
       >
         <img
-          src="/logo.jpg"
+          src="/logo.png"
           alt=""
           style={{
             height: 50,

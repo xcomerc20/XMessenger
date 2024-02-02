@@ -22,7 +22,7 @@ export function TokenSelect({ setTokenAddress }: Props) {
       }
     >
       <Select.Trigger
-        className="z-[100] border-[#2a3843] border-2 border-solid text-center text-white"
+        className="z-[100] border-[#BDBDBD] border border-solid text-center text-white"
         aria-label="Food"
       >
         <div className="flex justify-center gap-2">
@@ -38,7 +38,7 @@ export function TokenSelect({ setTokenAddress }: Props) {
       </Select.Trigger>
 
       <Select.Portal>
-        <Select.Content className="z-[100] bg-white text-black p-2 rounded-sm w-52">
+        <Select.Content className="z-[100] bg-[#BDBDBD] text-black font-bold p-2 rounded-sm w-52">
           <Select.Viewport>
             {Object.entries(mainnetTokens).map(([name, address]) => (
               <SelectItem

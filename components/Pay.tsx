@@ -10,9 +10,12 @@ import {
   useContractReads,
   useContractWrite,
   useNetwork,
+  useSwitchNetwork,
 } from "wagmi";
 import { parseEther } from "viem";
 import { TokenSelect } from "./TokenSelect";
+import { configuredChains } from "@/lib/constants";
+import { montserrat } from "@/lib/fonts";
 
 interface Props {
   msg: string;
@@ -28,6 +31,7 @@ export function Pay({ contact, setModal, setMsg, handleSend, msg }: Props) {
   const [sendCoin, setSendCoin] = useState(true);
   const [chainId, setChainId] = useState(1);
   const [err, setErr] = useState("");
+  const [proceed, setProceed] = useState(false);
 
   const tokenContract = {
     abi: erc20ABI,
@@ -59,6 +63,8 @@ export function Pay({ contact, setModal, setMsg, handleSend, msg }: Props) {
   const txError = isError || isContractError;
   const chainName = chainId === 1 ? "Ethereum Mainnet" : "Goerli Testnet";
   const { chain } = useNetwork();
+  const { switchNetwork, isSuccess: isNetworkSwitchSuccess } =
+    useSwitchNetwork();
 
   function sendCrypto() {
     if (Number(amount) <= 0) {
@@ -68,8 +74,21 @@ export function Pay({ contact, setModal, setMsg, handleSend, msg }: Props) {
     } else if (!tokenData && !sendCoin) {
       setErr(`No token found on ${chainName}.`);
     } else if (chain?.id !== chainId) {
-      setErr(`Please switch to ${chainName} in your wallet.`);
+      setProceed(true);
+      if (chain?.id && switchNetwork) {
+        switchNetwork(chainId);
+      }
     } else {
+      setProceed(true);
+    }
+  }
+
+  useEffect(() => {
+    if (
+      proceed &&
+      (isNetworkSwitchSuccess || chain?.id === chainId) &&
+      !showLoader
+    )
       if (sendCoin) {
         if (sendTransaction) {
           sendTransaction();
@@ -79,8 +98,7 @@ export function Pay({ contact, setModal, setMsg, handleSend, msg }: Props) {
           args: [contact.address, parseEther(amount)],
         });
       }
-    }
-  }
+  }, [proceed, isNetworkSwitchSuccess, chainId, chain]);
 
   useEffect(() => {
     let txHash: string | undefined;
@@ -103,6 +121,10 @@ export function Pay({ contact, setModal, setMsg, handleSend, msg }: Props) {
   }, [txSuccess, txError]);
 
   useEffect(() => {
+    setTokenAddress(undefined);
+  }, [chainId]);
+
+  useEffect(() => {
     if (txSuccess) {
       handleSend();
     }
@@ -114,25 +136,57 @@ export function Pay({ contact, setModal, setMsg, handleSend, msg }: Props) {
 
   return (
     <Modal setModal={setModal}>
-      <h3 style={{ marginBottom: 20, fontSize: "1.5rem", textAlign: "center" }}>
-        Pay
+      <h3
+        className={montserrat.className}
+        style={{ fontWeight: 700, fontSize: "1.5rem", textAlign: "center" }}
+      >
+        Send To
+      </h3>
+      <h3
+      className="text-sm"
+        style={{
+          marginBottom: 20,
+          color: "#ffff",
+          textAlign: "center",
+          overflowWrap: "anywhere"
+        }}
+      >
+        {contact.address}
       </h3>
 
-      <div className="flex flex-col gap-4 w-72">
+      <div className={"flex flex-col gap-4 w-72 " + montserrat.className}>
         {err && <span style={{ color: "red" }}>{err}</span>}
         <div className="flex gap-4 justify-center">
           <button
             className={`px-4 py-2 w-1/2 transition-all ${
-              !sendCoin ? "bg-[#2a3843]" : ""
+              !sendCoin ? "bg-[#6B6B6B30]" : ""
             }`}
+            style={{
+              backgroundColor: "#FFFFFFD1",
+              border: sendCoin ? "1px solid #FFFFFF" : "1px solid #0000004D",
+              background: sendCoin
+                ? "#FFFFFFD1"
+                : "linear-gradient(180deg, rgba(0, 0, 0, 0.07) 0%, rgba(66, 66, 66, 0.07) 31%, rgba(255, 255, 255, 0.07) 60.5%)",
+              color: sendCoin ? "#383838" : "#FFFFFF",
+              borderRadius: 4,
+            }}
             onClick={() => setSendCoin(true)}
           >
-            Coin
+            ETH
           </button>
           <button
             className={`px-4 py-2 w-1/2 transition-all ${
-              sendCoin ? "bg-[#2a3843]" : ""
+              sendCoin ? "bg-[#6B6B6B30]" : ""
             }`}
+            style={{
+              backgroundColor: "#FFFFFFD1",
+              border: !sendCoin ? "1px solid #FFFFFF" : "1px solid #0000004D",
+              background: !sendCoin
+                ? "#FFFFFFD1"
+                : "linear-gradient(180deg, rgba(0, 0, 0, 0.07) 0%, rgba(66, 66, 66, 0.07) 31%, rgba(255, 255, 255, 0.07) 60.5%)",
+              color: !sendCoin ? "#383838" : "#FFFFFF",
+              borderRadius: 4,
+            }}
             onClick={() => setSendCoin(false)}
           >
             Token
@@ -142,7 +196,7 @@ export function Pay({ contact, setModal, setMsg, handleSend, msg }: Props) {
         <div className="flex flex-col gap-4">
           <div className="flex relative">
             <input
-              className="bg-[#2a3843] px-3 py-3 text-white appearance-none outline-none w-full"
+              className="bg-[#BDBDBD] px-3 py-3 text-black appearance-none outline-none w-full"
               type="text"
               value={amount}
               placeholder="Amount"
@@ -166,8 +220,8 @@ export function Pay({ contact, setModal, setMsg, handleSend, msg }: Props) {
             <>
               <input
                 type="text"
-                value={tokenAddress}
-                className="bg-[#2a3843] px-3 py-3 text-white appearance-none outline-none"
+                value={tokenAddress || ""}
+                className="bg-[#6B6B6B30] px-3 py-3 text-white appearance-none outline-none"
                 placeholder="ERC20 Token Address"
                 onChange={(e) =>
                   setTokenAddress(e.target.value as `0x${string}`)
@@ -186,8 +240,13 @@ export function Pay({ contact, setModal, setMsg, handleSend, msg }: Props) {
 
       <button
         onClick={sendCrypto}
-        className="bg-#087cad text-white px-4 py-2 rounded-3xl flex items-center justify-center"
-        style={{ width: 150, marginTop: 20 }}
+        className={" text-black px-4 py-2 rounded-lg flex items-center justify-center " + montserrat.className}
+        style={{
+          width: 150,
+          marginTop: 20,
+          backgroundColor: "white",
+          borderRadius: 4,
+        }}
         disabled={showLoader}
       >
         {showLoader ? <Loader /> : txSuccess ? <>Sent!</> : <>Send</>}

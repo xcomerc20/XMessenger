@@ -43,3 +43,14 @@ export function sleep(ms: number) {
 export function msgIsTransaction(message: string) {
   return message.startsWith("tx");
 }
+
+export function msgIsValid(message: string) {
+  const invalidMessages = [
+    "invalid continuation byte",
+    "invalid of encryption",
+  ];
+
+  const isMsgValid = !invalidMessages.includes(message?.toLowerCase());
+
+  return isMsgValid;
+}

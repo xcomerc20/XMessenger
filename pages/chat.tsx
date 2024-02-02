@@ -6,7 +6,7 @@ import Splash from "@/components/Splash";
 import { COOKIES } from "@/lib/constants";
 import { deleteCookie, getCookie, hasCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
 import {
   DocumentData,
@@ -20,9 +20,14 @@ import {
 } from "firebase/firestore";
 import initFire from "@/lib/initfire";
 import { getApps } from "firebase/app";
+import { useAuth } from "@/contexts/AuthContexts";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function ChatPage() {
-  const [data, setData] = useState<any>(undefined);
+  const authContext = useAuth();
+  const data = authContext ? authContext.data : null;
+  const setData = authContext ? authContext.setData : null;
+
   const [showProfile, setShowProfile] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [chat, setChat] = useState<any>(undefined);
@@ -31,8 +36,6 @@ export default function ChatPage() {
   const [user, setUser] = useState({});
   const convRef = useRef<HTMLDivElement>(null);
 
-  const router = useRouter();
-
   const updateChat = (newChat: any) => {
     const index = data?.history.findIndex((i: any) => i?.id === chat?.id);
     const history = [...data?.history];
@@ -40,7 +43,9 @@ export default function ChatPage() {
       ...chat,
       messages: [...(chat?.messages || []), ...newChat],
     });
-    setData({ ...data, history });
+    if (setData) {
+      setData({ ...data, history: history });
+    }
     setChat(history[index]);
     if (convRef.current) {
       const conv = convRef.current as HTMLDivElement;
@@ -69,32 +74,6 @@ export default function ChatPage() {
     });
     setUpdates((prev: any) => [...prev, ...newChat]);
   };
-
-  useEffect(() => {
-    if (hasCookie(COOKIES.AUTH)) {
-      const token = getCookie(COOKIES.AUTH);
-      if (token) {
-        (async () => {
-          const promise = await fetch("/api/updates", {
-            headers: {
-              Authorization: token,
-            },
-          });
-          const res = await promise.json();
-          if (res.err) {
-            deleteCookie(COOKIES.AUTH);
-            router.replace("/");
-          } else {
-            setData({ token, ...res });
-          }
-        })();
-      } else {
-        router.replace("/");
-      }
-    } else {
-      router.replace("/");
-    }
-  }, []);
 
   useEffect(() => {
     initFire();
@@ -148,19 +127,16 @@ export default function ChatPage() {
 
   const contact = chat?.members?.find((i: any) => i.id !== data.user_id);
 
-  console.log(chat, "chat here");
-
   return (
-    <main style={{ display: "flex", width: "100vw", overflowY: "hidden" }}>
+    <PageWrapper>
       {data ? (
-        <>
+        <main>
           <div
-            className={`flex justify-center ${
+            className={`flex justify-center w-full ${
               showProfile && chat ? "no-mobile" : ""
             }`}
-            style={{ width: "100%" }}
           >
-            <div className="flex w-full h-screen " style={{ width: "100%" }}>
+            <div className="flex w-full">
               <ChatsList
                 data={data}
                 setChat={setChat}
@@ -187,10 +163,10 @@ export default function ChatPage() {
           {showSettings && (
             <Settings setShowSettings={setShowSettings} data={data} />
           )}
-        </>
+        </main>
       ) : (
         <Splash />
       )}
-    </main>
+    </PageWrapper>
   );
 }

@@ -15,13 +15,24 @@ export default function Profile({ setShowProfile, data }: any) {
           rel="stylesheet"
         />
       </Head>
+
       <section
-        style={{ width: "40%", fontFamily: "Montserrat" }}
-        className=" bg-[#202d36] flex font-medium items-center justify-center h-screen full-screen"
+        style={{
+          width: "40%",
+          fontFamily: "Sarpanch",
+          maxHeight: "100vh",
+          position: "absolute",
+          top: 0,
+        }}
+        className=" bg-[#222222] flex font-medium items-center justify-center h-screen full-screen"
       >
         <section
-          className="w-full h-[90vh]  mx-auto bg-[#24353f] rounded-3xl rounded-br-none rounded-bl-none px-8 py-6 shadow-lg "
-          style={{ textAlign: "center", marginTop: "20%" }}
+          className="w-full h-[90vh]  mx-auto rounded-3xl rounded-br-none rounded-bl-none px-8 py-6 shadow-lg "
+          style={{
+            textAlign: "center",
+            marginTop: "20%",
+            background: "linear-gradient(#000000, #222222)",
+          }}
         >
           <div className="flex items-center justify-between">
             <button
@@ -36,16 +47,16 @@ export default function Profile({ setShowProfile, data }: any) {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 className="lucide lucide-chevron-left"
               >
                 <path d="m15 18-6-6 6-6" />
               </svg>
               Back
             </button>
-            <span className="text-emerald-400">
+            <span className="text-gray-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -63,19 +74,28 @@ export default function Profile({ setShowProfile, data }: any) {
             </span>
           </div>
           <div className="mt-6 w-fit mx-auto">
-            <img
-              src={data.pic || "/nopic.svg"}
-              className="rounded-full w-28 "
-              alt="profile picture"
-              srcSet=""
-            />
+            {data?.pic ? (
+              <img
+                src={data?.pic}
+                className="rounded-full w-28 "
+                alt="profile picture"
+                srcSet=""
+              />
+            ) : (
+              <img
+                src={"/nopic.svg"}
+                className="rounded-full w-28 "
+                alt="profile picture"
+                srcSet=""
+              />
+            )}
           </div>
           <div className="mt-8 ">
             <h2 className="text-white font-bold text-2xl tracking-wide">
               {data?.name || "Unknown User"}
             </h2>
           </div>
-          <p className="text-emerald-400 font-semibold mt-2.5">
+          <p className="text-whitefont-semibold mt-2.5">
             {data?.address.slice(0, 12) +
               "..." +
               data?.address.slice(-12, data?.address?.length) ||
@@ -87,6 +107,7 @@ export default function Profile({ setShowProfile, data }: any) {
               color: "red",
               border: "2px solid red",
               background: "transparent",
+              borderRadius: 12,
             }}
           >
             Block User

@@ -42,6 +42,7 @@ export default function NewChat({ data, setChat, setModal }: any) {
                 },
               ],
               owner: data?.id,
+              key: res.key,
             });
             setModal(false);
           }
@@ -59,9 +60,9 @@ export default function NewChat({ data, setChat, setModal }: any) {
         Start New Conversation
       </h3>
       <input
-        className="bg-[#2a3843] rounded-lg w-full px-3 py-3 text-white"
+        className="bg-[#BDBDBD] rounded-lg w-full px-3 py-3 text-black"
         type="text"
-        placeholder="Paste any address to start messaging"
+        placeholder="Enter an address to start messaging"
         value={address}
         onChange={(e) => setAddress(e.target.value)}
         onKeyUp={(e) => (e.key === "Enter" && !loading ? handleCreate() : "")}
@@ -69,8 +70,13 @@ export default function NewChat({ data, setChat, setModal }: any) {
       />
       <button
         onClick={handleCreate}
-        className="bg-#087cad text-white px-4 py-2 rounded-3xl"
-        style={{ width: 150, marginTop: 20 }}
+        className=" text-black px-4 py-2 rounded-3xl"
+        style={{
+          width: 150,
+          marginTop: 20,
+          backgroundColor: "white",
+          borderRadius: 4,
+        }}
         disabled={loading}
       >
         Start

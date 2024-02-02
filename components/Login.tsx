@@ -10,6 +10,7 @@ import Splash from "./Splash";
 export default function Login() {
   const { open } = useWeb3Modal();
   const { isConnected, address } = useAccount();
+
   const router = useRouter();
   const [data, setData] = useState({} as any);
   const [nameInput, setInput] = useState("");
@@ -22,6 +23,8 @@ export default function Login() {
     token?: string;
     error?: string;
   }>({});
+
+  const [showSignMsgWarning, setSignMsgWarning] = useState(false);
 
   const fetchNonce = async () => {
     setAuth({ ...auth, loading: true });
@@ -50,10 +53,12 @@ export default function Login() {
         chainId,
         nonce: auth.nonce,
       });
+      setSignMsgWarning(true);
       const signature = await signMessageAsync({
         message: message.prepareMessage(),
       });
 
+      setSignMsgWarning(false);
       // Verify signature
       const verifyRes = await fetch("/api/auth", {
         method: "POST",
@@ -94,7 +99,7 @@ export default function Login() {
 
   useEffect(() => {
     if (hasCookie(COOKIES.AUTH)) {
-      router.replace("/chat");
+      // router.replace("/chat");
     } else if (
       isConnected &&
       address &&
@@ -122,63 +127,111 @@ export default function Login() {
   return (
     <>
       {auth.loading ? (
-        <Splash />
+        <Splash
+          message={showSignMsgWarning ? "Sign message in your wallet" : ""}
+        />
       ) : (
         <div
-          className="login flex-center"
+          className="login flex-center items-center justify-center"
           style={{
-            minHeight: auth.loading ? "100vh" : "60vh",
+            height: auth.loading ? "100vh" : "380px",
             width: auth.loading ? "100vw" : "400px ",
-            borderRadius: auth.loading ? "0" : "1.5rem",
-            background: "#0c1521",
+            border: "1px solid #0000005E",
+            borderRadius: auth.loading ? "0" : "36px",
             padding: 30,
+            boxShadow: "2px 4px 4px 4px #FFFFFF29",
             textAlign: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexDirection: "column",
+            background: "#6B6B6B30",
           }}
         >
-          <img
-            src="/logo.jpg"
+          <h3
             style={{
-              width: auth.loading ? "5vw" : "20%",
-
-              borderRadius: "50%",
-              margin: auth.loading ? "auto" : "40px 0 0",
+              color: "#FFFFFF",
+              marginTop: 30,
+              marginBottom: "30px",
+              fontSize: 15
+            }}
+          >
+            CruxDecussata Presents
+          </h3>
+          <img
+            src="/newlogo.png"
+            style={{
+              width: 175,
+              height: 140,
+              marginBottom: 20,
             }}
             alt=""
           />
           {!isConnected && (
             <>
-              <h1
+              {/* <h1
                 style={{
-                  margin: "40px 20px  0",
-                  fontSize: "2rem",
+                  marginTop: 35,
+                  fontSize: 24,
                   fontWeight: "bold",
                   whiteSpace: "nowrap",
                 }}
               >
-                Welcome Back !
-              </h1>
-              <p style={{ margin: 5, color: "#aaa" }}>
+                WELCOME
+              </h1> */}
+              {/* <p style={{ margin: 5, color: "#6D6D6D", fontSize: 16 }}>
                 Login with your Web3 wallet
-              </p>
-              <button onClick={() => open()} style={{ margin: 30 }}>
-                Connect Wallet
+              </p> */}
+              <button
+                onClick={() => open()}
+                style={{
+                  margin: "10px 0 5px 0",
+                  padding: "3px 40px",
+                  borderRadius: 4,
+                  fontSize: 15,
+                  color: "#000000",
+                  background:
+                    "linear-gradient(180deg, #FFFFFF 0%, #999999 100%)",
+                }}
+              >
+                CONNECT WALLET
               </button>
+              <h3
+                style={{
+                  marginBottom: 20,
+                  color: "#FFFFFF",
+                }}
+              >
+                Connect wallet to continue
+              </h3>
             </>
           )}
           {isConnected && !auth.loading && (
             <>
               {!auth.exists && (
                 <>
-                  <h3 style={{ margin: "20px  0" }}>Get Started</h3>
+                  <h3
+                    style={{
+                      margin: "5px 0px",
+                      width: 236,
+                      fontSize: 20,
+                    }}
+                  >
+                    Create Your Username
+                  </h3>
                   <input
                     value={nameInput}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Enter your name"
-                    style={{ marginTop: 30, width: "90%" }}
+                    style={{
+                      width: "80%",
+                      backgroundColor: "#BDBDBD",
+                      color: "#000000",
+                      borderRadius: 10,
+                      height: 30,
+                      fontSize: 12,
+                      padding: "18px 10px",
+                      marginBottom: 10
+                    }}
                   />
                   <button
                     onClick={() => {
@@ -187,9 +240,15 @@ export default function Login() {
                         signIn();
                       }
                     }}
-                    style={{ margin: 20 }}
+                    style={{
+                      marginBottom: 30,
+                      background: "linear-gradient(180deg, #FFFFFF 0%, #999999 100%)",
+                      color: "#000000",
+                      padding: "2px 6px",
+                      borderRadius: 6,
+                    }}
                   >
-                    Continue
+                    Create Account
                   </button>
                 </>
               )}

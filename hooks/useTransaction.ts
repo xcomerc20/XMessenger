@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDebounce } from "use-debounce";
 import { parseEther } from "viem";
 import {
+  useNetwork,
   useSendTransaction,
   useSwitchNetwork,
   useWaitForTransaction,

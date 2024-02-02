@@ -1,5 +1,5 @@
 import { authenticateUser, getUser, validateAuth } from "@/lib/auth";
-import getDatabase from "@/lib/firebase";
+import getDatabase, { db } from "@/lib/firebase";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -21,7 +21,8 @@ export default async function handler(
           updates.name = name;
         }
         if (updates.name || updates.pic) {
-          const db = getDatabase();
+          // const db = getDatabase();
+          
           try {
             const token = await authenticateUser({
               id: data.user_id,

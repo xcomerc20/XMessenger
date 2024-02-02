@@ -1,6 +1,6 @@
 import { getUser, validateAuth } from "@/lib/auth";
 import { createSecret } from "@/lib/encryption";
-import getDatabase from "@/lib/firebase";
+import getDatabase, { db } from "@/lib/firebase";
 import { Timestamp } from "firebase-admin/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -16,7 +16,8 @@ export default async function handler(
 
         const data = await validateAuth(req, res);
         if (data.user_id && conv && conv?.length > 0) {
-          const db = getDatabase();
+          // const db = getDatabase();
+          
           try {
             const docs = await db
               .collection(`conversations/${conv}/messages`)

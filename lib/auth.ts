@@ -1,5 +1,5 @@
 import { Address } from "wagmi";
-import getDatabase from "./firebase";
+import getDatabase, { db } from "./firebase";
 import { NextApiRequest, NextApiResponse } from "next";
 import { SignJWT, jwtVerify } from "jose";
 
@@ -22,7 +22,7 @@ export const verifyToken = async (token: string) => {
 };
 
 export const getUser = async (address: any): Promise<any> => {
-  const db = getDatabase();
+  // const db = getDatabase();
 
   let user;
   const querySnapshot = await db
@@ -56,10 +56,10 @@ export const authenticateUser = async (data: {
     .collection("users")
     .doc(data.id)
     .update({
+      ...(data?.pic ? { pic: data.pic } : {}),
       token,
       nonce: "",
       name: data.name,
-      ...(data?.pic ? { pic: data.pic } : {}),
     });
 
   return token;

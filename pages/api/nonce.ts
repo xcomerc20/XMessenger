@@ -1,5 +1,5 @@
 import { getUser } from "@/lib/auth";
-import getDatabase from "@/lib/firebase";
+import getDatabase, { db } from "@/lib/firebase";
 import { NextApiRequest, NextApiResponse } from "next";
 import { generateNonce } from "siwe";
 
@@ -10,8 +10,10 @@ export default async function handler(
   const { method } = req;
   switch (method) {
     case "GET":
+      console.log("GET");
       const { address } = req.query;
-      const db = getDatabase();
+      // const db = getDatabase();
+      
       const nonce = generateNonce();
 
       try {

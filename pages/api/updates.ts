@@ -1,5 +1,5 @@
 import { validateAuth } from "@/lib/auth";
-import getDatabase from "@/lib/firebase";
+import getDatabase, { db } from "@/lib/firebase";
 import { compareTime } from "@/lib/helpers";
 import {
   DocumentReference,
@@ -17,29 +17,53 @@ export default async function handler(
     case "GET": {
       try {
         const data = await validateAuth(req, res);
+        console.log("1 auth done");
+
         if (data?.user_id && data?.name) {
-          const db = getDatabase();
-
           // Get chats
-
           const chats = await db
             .collection("conversations")
             .where("members", "array-contains", data.user_id)
             .get();
+
+          console.log("2 conv done");
           const chatData: any[] = [];
           chats.forEach((i) => chatData.push({ ...i.data(), id: i.id }));
 
-          // Get messages
-          const messagesRef = await db
-            .collectionGroup("messages")
-            .where(
-              "c",
-              "in",
-              chatData.map((i) => i.id)
-            )
-            .orderBy("t", "desc")
-            .limit(100)
-            .get();
+          // Extract chat IDs and user IDs
+          const chatIds = chatData.map((i) => i.id);
+          const userIds: string[] = [];
+          chatData.forEach((i) =>
+            userIds.push(...i.members.filter((x: any) => x !== data.user_id))
+          );
+
+          // Check if chatIds or userIds are empty before proceeding
+          if (chatIds.length === 0 || userIds.length === 0) {
+            return res.status(200).json({ ...data, history: [] });
+          }
+
+          console.log("3 proc done");
+          // Fetch messages and users concurrently
+          const [messagesRef, usersRef] = await Promise.all([
+            chatIds.length > 0
+              ? db
+                  .collectionGroup("messages")
+                  .where("c", "in", chatIds)
+                  .orderBy("t", "desc")
+                  .limit(100)
+                  .get()
+              : [],
+            userIds.length > 0
+              ? db
+                  .collection("users")
+                  .where(FieldPath.documentId(), "in", userIds)
+                  .select("name", "pic", "address")
+                  .get()
+              : [],
+          ]);
+
+          console.log("4 msg fet done");
+          // Process messages
           const messagesData: any = {};
           messagesRef.forEach((i: any) => {
             const m = { ...i.data(), id: i.id };
@@ -50,23 +74,12 @@ export default async function handler(
             }
           });
 
-          // Get contacts
-          const userIds: string[] = [];
-          chatData.map((i) =>
-            userIds.push(...i?.members?.filter((x: any) => x !== data.user_id))
-          );
-
-          const usersRef = await db
-            .collection("users")
-            .where(FieldPath.documentId(), "in", userIds)
-            .select("name", "pic", "address")
-            .get();
-
+          // Process users
           const userData: any[] = [];
           usersRef.forEach((i) => userData.push({ ...i.data(), id: i.id }));
 
+          console.log("5 msg format done");
           // Merge data
-
           const history: any[] = chatData
             .map((i) => ({
               ...i,
@@ -89,19 +102,19 @@ export default async function handler(
                 : 0
             );
 
+          console.log("6 msg sort done");
           return res.send({ ...data, history });
         } else {
           return res.send({ err: "No name" });
         }
       } catch (_error) {
         console.log(_error);
-
         res.json({ ok: false });
       }
       break;
     }
     default:
-      res.setHeader("Allow", ["POST"]);
+      res.setHeader("Allow", ["GET"]);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 }

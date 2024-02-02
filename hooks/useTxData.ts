@@ -3,9 +3,9 @@ import { erc20ABI, useContractRead, useTransaction } from "wagmi";
 import { blockScanners, currencies } from "@/lib/constants";
 
 export function useTxData({ message, user_id }: Omit<MessageProps, "aes">) {
-  const [chainId, hash, tokenAddress, tokenAmount] = message.m
-    .split(":")
-    .slice(1);
+  const [chainId, hash, tokenAddress, tokenAmount] = (
+    message.m?.split(":") ?? []
+  ).slice(1);
 
   const { data: tokenData } = useContractRead({
     abi: erc20ABI,

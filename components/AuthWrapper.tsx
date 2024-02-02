@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAccount, useNetwork, useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import Head from "next/head";
 
@@ -16,11 +16,11 @@ export default function AuthWrapper({ children }: any) {
     setHasMounted(true);
   }, []);
 
-  useEffect(() => {
+  /*  useEffect(() => {
     if (!isConnected || !address) {
       router.replace("/");
     }
-  }, [isConnected, address]);
+  }, [isConnected, address]); */
 
   // Render
   if (!hasMounted) return null;

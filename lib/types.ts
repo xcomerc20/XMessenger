@@ -23,4 +23,5 @@ export interface IMessage {
   t: { _seconds: number; _nanoseconds: number };
   m: string;
   id: string;
+  type?: "temp";
 }

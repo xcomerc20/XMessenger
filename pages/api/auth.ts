@@ -12,6 +12,7 @@ export default async function handler(
   switch (method) {
     case "GET": {
       try {
+        console.log("GET");
         const data = await validateAuth(req, res);
         const additionalClaims = { uid: data.user_id, address: data.address };
         await getAuth()
@@ -36,14 +37,13 @@ export default async function handler(
         if (message && signature && address) {
           const siweMessage = new SiweMessage(message);
           const fields = await siweMessage.verify({ signature });
-
           const user = await getUser(address);
           if (
-            (fields.success && fields.data.nonce !== user.nonce) ||
+            (!fields.success && fields.data.nonce !== user.nonce) ||
             (!user.name && name && name?.trim()?.length === 0)
           )
             return res.status(422).json({ message: "Invalid data." });
-
+          console.log("POST");
           const token = await authenticateUser({
             id: user.id,
             name: name || user.name,

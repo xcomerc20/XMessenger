@@ -1,16 +1,19 @@
 import { useState } from "react";
-import Head from "next/head";
 import { Modal } from "./Modal";
 import { useRouter } from "next/router";
-import { getCookie, setCookie } from "cookies-next";
+import { getCookie, setCookie, deleteCookie } from "cookies-next";
 import { COOKIES } from "@/lib/constants";
+import { useDisconnect } from "wagmi";
+import { Loader } from "./SVG";
+import { montserrat } from "@/lib/fonts";
 
 export default function Settings({ setShowSettings, data }: any) {
   const [newName, setNewName] = useState(data?.name || "Unknown User");
-  const [newProfilePic, setNewProfilePic] = useState(data?.pic || "/nopic.svg");
+  const [newProfilePic, setNewProfilePic] = useState(data?.pic);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const router = useRouter();
+  const { disconnect, isLoading: isDisconnecting } = useDisconnect();
 
   const handleSave = async () => {
     setLoading(true);
@@ -40,7 +43,6 @@ export default function Settings({ setShowSettings, data }: any) {
         // set cookie
         setCookie(COOKIES.AUTH, res.token);
         const cookie = getCookie(COOKIES.AUTH);
-        console.log(res.token, cookie);
 
         if (cookie == res.token) {
           router.reload();
@@ -54,14 +56,20 @@ export default function Settings({ setShowSettings, data }: any) {
     setLoading(false);
   };
 
+  const handleLogout = async () => {
+    deleteCookie(COOKIES.AUTH);
+    disconnect();
+    router.reload();
+  };
+
   return (
     <>
       <Modal setModal={setShowSettings}>
         <section
-          className="w-full h-[55vh] mx-auto rounded-3xl shadow-lg "
+          className="w-full h-[55vh] mx-auto rounded-3xl"
           style={{ textAlign: "center" }}
         >
-          <h1 className="text-white text-xl font-bold mb-6">Edit Profile</h1>
+          <h1 className={"text-white text-2xl font-bold mb-6 " + montserrat.className}>Edit Profile</h1>
           <div className="mt-6 w-fit mx-auto relative">
             <label htmlFor="file-upload" className="cursor-pointer">
               <input
@@ -83,16 +91,19 @@ export default function Settings({ setShowSettings, data }: any) {
                 }}
               />
               <img
-                src={newProfilePic}
+                src={newProfilePic ?? "/nopic.svg"}
                 className="rounded-full w-28"
                 alt="profile picture"
-              />
-              <span
-                className="absolute rounded-full p-1"
                 style={{
-                  bottom: 0,
-                  right: 0,
-                  background: "rgb(0, 156, 233)",
+                  backgroundColor: "#D9D9D9",
+                }}
+              />
+              {/* <span
+                className="absolute rounded-full p-1 bg-white"
+                style={{
+                  bottom: -10,
+                  right: 35,
+                  color: "#3B3B3B",
                 }}
               >
                 <svg
@@ -102,72 +113,105 @@ export default function Settings({ setShowSettings, data }: any) {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   style={{ margin: 5 }}
                   className="lucide lucide-pencil"
                 >
                   <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
                   <path d="m15 5 4 4" />
                 </svg>
-              </span>
+              </span> */}
             </label>
           </div>
           <div
             className="mt-8 flex"
-            style={{ alignItems: "center", justifyContent: "center" }}
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className=" text-center text-white font-bold text-l tracking-wide bg-transparent border-b border-white"
+            <div
+              className="flex"
               style={{
-                border: "2px solid rgb(0, 156, 233)",
-                padding: 5,
-                width: "70% ",
-              }}
-            />
-            <span
-              className=" rounded-full p-1"
-              style={{
-                margin: "0 0  0 10px",
-                background: "rgb(0, 156, 233)",
+                border: "1px solid #BDBDBD",
+                borderRadius: 12,
+                background: "#BDBDBD",
+                width: "80%",
               }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                style={{ margin: 5 }}
-                className="lucide lucide-pencil"
-              >
-                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                <path d="m15 5 4 4" />
-              </svg>
-            </span>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className=" text-center text-[#0000009B] font-bold text-l tracking-wide bg-transparent"
+                style={{
+                  padding: 5,
+                  width: "97%",
+                  borderRadius: 4,
+                  border: "none",
+                }}
+              />
+              {/* <i className=" rounded-full p-1 text-[#3B3B3B]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ margin: 5 }}
+                  className="lucide lucide-pencil"
+                >
+                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                  <path d="m15 5 4 4" />
+                </svg>
+              </i> */}
+            </div>
           </div>
 
           <span style={{ color: "red", textAlign: "center" }}>{err}</span>
-          <div className="mt-4">
+          <div className="mt-4 flex flex-col items-center gap-1">
             <button
               onClick={handleSave}
-              className="bg-#087cad text-white px-4 py-2 rounded-full"
+              className={"px-4 py-2 rounded-full " + montserrat.className}
               style={{
-                color: "white",
-                background: "rgb(0, 156, 233)",
-                width: "50%",
+                backgroundColor: "white",
+                border: "1px solid #BDBDBD",
+                color: "black",
+                borderRadius: 8,
+                width: "40%", // Set to the same width as the input
+                padding: 5,
                 marginTop: 20,
               }}
             >
               Save
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className={"px-4 py-2 rounded-full border-2 border-solid border-red-500 text-white " + montserrat.className}
+              style={{
+                width: "40%", // Set to the same width as the input
+                background: "#FF3636",
+                border: "1px solid #BA0404E4",
+                padding: 5,
+                borderRadius: 8,
+                marginTop: 10,
+              }}
+            >
+              {isDisconnecting ? (
+                <div className="flex justify-center gap-2">
+                  <Loader />
+                  Logging Out...
+                </div>
+              ) : (
+                "Logout"
+              )}
             </button>
           </div>
         </section>

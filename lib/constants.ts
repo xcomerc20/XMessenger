@@ -9,6 +9,15 @@ export const currencies: { [key: number | string]: string } = {
   5: "GeorliETH",
 };
 
+export const configuredChains: { [key: number | string]: string } = {
+  1: "Ethereum Mainnet",
+  56: "Binance Smart Chain",
+  3: "Arbitrum",
+  5: "Optimism",
+  857: "Polygon",
+  250: "Base",
+};
+
 export const mainnetTokens = {
   WBTC: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
   BNB: "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
